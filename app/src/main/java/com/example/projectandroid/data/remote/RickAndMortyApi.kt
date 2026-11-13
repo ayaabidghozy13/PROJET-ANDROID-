@@ -46,9 +46,9 @@ interface RickAndMortyApi {
         @Path("ids") ids: String
     ): List<Character>
 
-    // ---------------------------------------------------------
+
     // EPISODES
-    // ---------------------------------------------------------
+
 
     // Fetch a page of episodes with optional filters.
     @GET("episode")

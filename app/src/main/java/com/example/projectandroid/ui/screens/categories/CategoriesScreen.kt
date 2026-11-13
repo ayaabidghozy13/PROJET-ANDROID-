@@ -1,4 +1,3 @@
-
 package com.example.projectandroid.ui.screens.categories
 
 import androidx.compose.foundation.background
@@ -6,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -142,368 +142,407 @@ fun CategoriesScreen(
             .fillMaxSize()
             .background(BackgroundColor)
     ) {
-        LazyColumn(
-            state = activeListState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = WindowInsets.statusBars
-                    .asPaddingValues()
-                    .calculateTopPadding() + 82.dp,
-                bottom = WindowInsets.navigationBars
-                    .asPaddingValues()
-                    .calculateBottomPadding() + 28.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // HEADER
-            item {
-                Column(Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "EXPLORE THE",
-                        color = MintColor,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
-                    )
+            // Adapt the number of columns to the available screen width.
+            val columns = when {
+                maxWidth >= 900.dp -> 3
+                maxWidth >= 600.dp -> 2
+                else -> 1
+            }
 
-                    Spacer(Modifier.height(5.dp))
+            LazyColumn(
+                state = activeListState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = WindowInsets.statusBars
+                        .asPaddingValues()
+                        .calculateTopPadding() + 82.dp,
+                    bottom = WindowInsets.navigationBars
+                        .asPaddingValues()
+                        .calculateBottomPadding() + 28.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // HEADER
+                item {
+                    Column(Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "EXPLORE THE",
+                            color = MintColor,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 2.sp
+                        )
 
-                    Text(
-                        text = "MULTIVERSE",
-                        color = WhiteColor,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Black
-                    )
+                        Spacer(Modifier.height(5.dp))
 
-                    Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "MULTIVERSE",
+                            color = WhiteColor,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Black
+                        )
 
-                    Text(
-                        text = "Browse characters and episodes from the Rick and Morty universe.",
-                        color = WhiteColor.copy(alpha = 0.68f),
-                        fontSize = 12.sp,
-                        lineHeight = 18.sp
-                    )
+                        Spacer(Modifier.height(6.dp))
 
-                    Spacer(Modifier.height(18.dp))
+                        Text(
+                            text = "Browse characters and episodes from the Rick and Morty universe.",
+                            color = WhiteColor.copy(alpha = 0.68f),
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp
+                        )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        SectionButton(
-                            text = "✦ CHARACTERS",
-                            selected = selectedSection == "characters",
-                            modifier = Modifier.weight(1f)
+                        Spacer(Modifier.height(18.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            selectedSection = "characters"
-                        }
+                            SectionButton(
+                                text = "✦ CHARACTERS",
+                                selected = selectedSection == "characters",
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                selectedSection = "characters"
+                            }
 
-                        SectionButton(
-                            text = "▷ EPISODES",
-                            selected = selectedSection == "episodes",
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            selectedSection = "episodes"
+                            SectionButton(
+                                text = "▷ EPISODES",
+                                selected = selectedSection == "episodes",
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                selectedSection = "episodes"
+                            }
                         }
                     }
                 }
-            }
 
-            // SEARCH
-            item {
-                Column(Modifier.fillMaxWidth()) {
-                    Text(
-                        text = if (selectedSection == "characters") {
-                            "FIND A CHARACTER"
-                        } else {
-                            "FIND AN EPISODE"
-                        },
-                        color = MintColor,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.4.sp
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = activeSearch,
-                        onValueChange = { newValue ->
-                            if (selectedSection == "characters") {
-                                characterSearch = newValue
-                            } else {
-                                episodeSearch = newValue
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
-                        placeholder = {
-                            Text(
-                                text = if (selectedSection == "characters") {
-                                    "Search Rick, Morty, Summer..."
-                                } else {
-                                    "Search Pilot, Rickmancing..."
-                                },
-                                color = WhiteColor.copy(alpha = 0.42f),
-                                fontSize = 12.sp
-                            )
-                        },
-                        leadingIcon = {
-                            Text(
-                                text = "⌕",
-                                color = AccentColor,
-                                fontSize = 25.sp
-                            )
-                        },
-                        trailingIcon = {
-                            if (activeSearch.isNotEmpty()) {
-                                Text(
-                                    text = "×",
-                                    modifier = Modifier
-                                        .clickable {
-                                            if (selectedSection == "characters") {
-                                                characterSearch = ""
-                                            } else {
-                                                episodeSearch = ""
-                                            }
-                                        }
-                                        .padding(
-                                            horizontal = 12.dp,
-                                            vertical = 6.dp
-                                        ),
-                                    color = WhiteColor,
-                                    fontSize = 22.sp
-                                )
-                            }
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = WhiteColor,
-                            unfocusedTextColor = WhiteColor,
-                            focusedBorderColor = AccentColor,
-                            unfocusedBorderColor = WhiteColor.copy(alpha = 0.15f),
-                            focusedContainerColor = CardColor,
-                            unfocusedContainerColor = CardColor,
-                            cursorColor = AccentColor
-                        )
-                    )
-
-                    if (selectedSection == "characters") {
-                        Spacer(Modifier.height(14.dp))
-
+                // SEARCH
+                item {
+                    Column(Modifier.fillMaxWidth()) {
                         Text(
-                            text = "LIFE STATUS",
-                            color = WhiteColor.copy(alpha = 0.65f),
+                            text = if (selectedSection == "characters") {
+                                "FIND A CHARACTER"
+                            } else {
+                                "FIND AN EPISODE"
+                            },
+                            color = MintColor,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.2.sp
+                            letterSpacing = 1.4.sp
                         )
 
                         Spacer(Modifier.height(8.dp))
 
-                        Row(
+                        OutlinedTextField(
+                            value = activeSearch,
+                            onValueChange = { newValue ->
+                                if (selectedSection == "characters") {
+                                    characterSearch = newValue
+                                } else {
+                                    episodeSearch = newValue
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            listOf(
-                                "ALL" to "all",
-                                "ALIVE" to "alive",
-                                "DEAD" to "dead",
-                                "UNKNOWN" to "unknown"
-                            ).forEach { (label, value) ->
-                                StatusFilterButton(
-                                    text = label,
-                                    selected = selectedStatus == value,
-                                    modifier = Modifier.weight(
-                                        if (value == "unknown") 1.2f else 1f
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            placeholder = {
+                                Text(
+                                    text = if (selectedSection == "characters") {
+                                        "Search Rick, Morty, Summer..."
+                                    } else {
+                                        "Search Pilot, Rickmancing..."
+                                    },
+                                    color = WhiteColor.copy(alpha = 0.42f),
+                                    fontSize = 12.sp
+                                )
+                            },
+                            leadingIcon = {
+                                Text(
+                                    text = "⌕",
+                                    color = AccentColor,
+                                    fontSize = 25.sp
+                                )
+                            },
+                            trailingIcon = {
+                                if (activeSearch.isNotEmpty()) {
+                                    Text(
+                                        text = "×",
+                                        modifier = Modifier
+                                            .clickable {
+                                                if (selectedSection == "characters") {
+                                                    characterSearch = ""
+                                                } else {
+                                                    episodeSearch = ""
+                                                }
+                                            }
+                                            .padding(
+                                                horizontal = 12.dp,
+                                                vertical = 6.dp
+                                            ),
+                                        color = WhiteColor,
+                                        fontSize = 22.sp
                                     )
-                                ) {
-                                    selectedStatus = value
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = WhiteColor,
+                                unfocusedTextColor = WhiteColor,
+                                focusedBorderColor = AccentColor,
+                                unfocusedBorderColor = WhiteColor.copy(alpha = 0.15f),
+                                focusedContainerColor = CardColor,
+                                unfocusedContainerColor = CardColor,
+                                cursorColor = AccentColor
+                            )
+                        )
+
+                        if (selectedSection == "characters") {
+                            Spacer(Modifier.height(14.dp))
+
+                            Text(
+                                text = "LIFE STATUS",
+                                color = WhiteColor.copy(alpha = 0.65f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.2.sp
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                listOf(
+                                    "ALL" to "all",
+                                    "ALIVE" to "alive",
+                                    "DEAD" to "dead",
+                                    "UNKNOWN" to "unknown"
+                                ).forEach { (label, value) ->
+                                    StatusFilterButton(
+                                        text = label,
+                                        selected = selectedStatus == value,
+                                        modifier = Modifier.weight(
+                                            if (value == "unknown") 1.2f else 1f
+                                        )
+                                    ) {
+                                        selectedStatus = value
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            // DATABASE STATUS
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = CardColor
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                // DATABASE STATUS
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = CardColor
+                        )
                     ) {
-                        Column {
-                            Text(
-                                text = if (selectedSection == "characters") {
-                                    "CHARACTER DATABASE"
-                                } else {
-                                    "EPISODE DATABASE"
-                                },
-                                color = WhiteColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.2.sp
-                            )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = if (selectedSection == "characters") {
+                                        "CHARACTER DATABASE"
+                                    } else {
+                                        "EPISODE DATABASE"
+                                    },
+                                    color = WhiteColor,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.2.sp
+                                )
 
-                            Spacer(Modifier.height(4.dp))
+                                Spacer(Modifier.height(4.dp))
 
-                            Text(
-                                text = if (selectedSection == "characters") {
-                                    "${characters.size} results loaded"
-                                } else {
-                                    "${episodes.size} results loaded"
-                                },
-                                color = WhiteColor.copy(alpha = 0.62f),
-                                fontSize = 11.sp
+                                Text(
+                                    text = if (selectedSection == "characters") {
+                                        "${characters.size} results loaded"
+                                    } else {
+                                        "${episodes.size} results loaded"
+                                    },
+                                    color = WhiteColor.copy(alpha = 0.62f),
+                                    fontSize = 11.sp
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(
+                                        when {
+                                            isLoading || isLoadingMore ->
+                                                Color(0xFFFFC857)
+                                            error != null ->
+                                                Color(0xFFFF5A68)
+                                            else -> AccentColor
+                                        }
+                                    )
                             )
                         }
+                    }
+                }
 
-                        Box(
+                // FIRST-PAGE LOADING
+                if (isLoading) {
+                    item {
+                        Column(
                             modifier = Modifier
-                                .size(10.dp)
-                                .clip(RoundedCornerShape(50))
-                                .background(
-                                    when {
-                                        isLoading || isLoadingMore ->
-                                            Color(0xFFFFC857)
-                                        error != null ->
-                                            Color(0xFFFF5A68)
-                                        else -> AccentColor
+                                .fillMaxWidth()
+                                .padding(vertical = 30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(color = AccentColor)
+
+                            Spacer(Modifier.height(12.dp))
+
+                            Text(
+                                text = "Scanning the multiverse...",
+                                color = WhiteColor.copy(alpha = 0.7f),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+
+                // ERROR
+                if (!isLoading && error != null) {
+                    item {
+                        ErrorPanel(message = error ?: "Unknown error.")
+                    }
+                }
+
+                // CHARACTER RESULTS
+                if (
+                    !isLoading &&
+                    error == null &&
+                    selectedSection == "characters"
+                ) {
+                    if (characters.isEmpty()) {
+                        item {
+                            EmptyResultsPanel(
+                                message = "No characters found.",
+                                suggestion = "Try another name or choose a different status."
+                            )
+                        }
+                    } else {
+                        items(
+                            items = characters.chunked(columns),
+                            key = { rowCharacters -> rowCharacters.first().id }
+                        ) { rowCharacters ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                rowCharacters.forEach { character ->
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        CharacterListCard(character = character) {
+                                            onNavigateToDetails("character", character.id)
+                                        }
+                                    }
+                                }
+
+                                // Keep the last row aligned when it has fewer cards.
+                                repeat(columns - rowCharacters.size) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+
+                        // CHARACTER PAGINATION
+                        if (hasMoreCharacters) {
+                            item(key = "load_more_characters") {
+                                LoadMoreButton(
+                                    isLoading = isLoadingMore,
+                                    onClick = {
+                                        viewModel.loadMoreCharacters()
                                     }
                                 )
-                        )
-                    }
-                }
-            }
-
-            // FIRST-PAGE LOADING
-            if (isLoading) {
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 30.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(color = AccentColor)
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text(
-                            text = "Scanning the multiverse...",
-                            color = WhiteColor.copy(alpha = 0.7f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            }
-
-            // ERROR
-            if (!isLoading && error != null) {
-                item {
-                    ErrorPanel(message = error ?: "Unknown error.")
-                }
-            }
-
-            // CHARACTER RESULTS
-            if (
-                !isLoading &&
-                error == null &&
-                selectedSection == "characters"
-            ) {
-                if (characters.isEmpty()) {
-                    item {
-                        EmptyResultsPanel(
-                            message = "No characters found.",
-                            suggestion = "Try another name or choose a different status."
-                        )
-                    }
-                } else {
-                    items(
-                        items = characters,
-                        key = { it.id }
-                    ) { character ->
-                        CharacterListCard(character = character) {
-                            onNavigateToDetails("character", character.id)
+                            }
                         }
                     }
+                }
 
-                    // CHARACTER PAGINATION
-                    if (hasMoreCharacters) {
-                        item(key = "load_more_characters") {
-                            LoadMoreButton(
-                                isLoading = isLoadingMore,
-                                onClick = {
-                                    viewModel.loadMoreCharacters()
-                                }
+                // EPISODE RESULTS
+                if (
+                    !isLoading &&
+                    error == null &&
+                    selectedSection == "episodes"
+                ) {
+                    if (episodes.isEmpty()) {
+                        item {
+                            EmptyResultsPanel(
+                                message = "No episodes found.",
+                                suggestion = "Try a different episode title."
                             )
                         }
-                    }
-                }
-            }
-
-            // EPISODE RESULTS
-            if (
-                !isLoading &&
-                error == null &&
-                selectedSection == "episodes"
-            ) {
-                if (episodes.isEmpty()) {
-                    item {
-                        EmptyResultsPanel(
-                            message = "No episodes found.",
-                            suggestion = "Try a different episode title."
-                        )
-                    }
-                } else {
-                    items(
-                        items = episodes,
-                        key = { it.id }
-                    ) { episode ->
-                        EpisodeListCard(episode = episode) {
-                            onNavigateToDetails("episode", episode.id)
-                        }
-                    }
-
-                    // EPISODE PAGINATION
-                    if (hasMoreEpisodes) {
-                        item(key = "load_more_episodes") {
-                            LoadMoreButton(
-                                isLoading = isLoadingMore,
-                                onClick = {
-                                    viewModel.loadMoreEpisodes()
+                    } else {
+                        items(
+                            items = episodes.chunked(columns),
+                            key = { rowEpisodes -> rowEpisodes.first().id }
+                        ) { rowEpisodes ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                rowEpisodes.forEach { episode ->
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        EpisodeListCard(episode = episode) {
+                                            onNavigateToDetails("episode", episode.id)
+                                        }
+                                    }
                                 }
-                            )
+
+                                // Keep the last row aligned when it has fewer cards.
+                                repeat(columns - rowEpisodes.size) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+
+                        // EPISODE PAGINATION
+                        if (hasMoreEpisodes) {
+                            item(key = "load_more_episodes") {
+                                LoadMoreButton(
+                                    isLoading = isLoadingMore,
+                                    onClick = {
+                                        viewModel.loadMoreEpisodes()
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            // FOOTER
-            item {
-                Spacer(Modifier.height(4.dp))
+                // FOOTER
+                item {
+                    Spacer(Modifier.height(4.dp))
 
-                Text(
-                    text = "MULTIVERSE SCAN COMPLETE • WUBBA LUBBA DUB DUB!",
-                    modifier = Modifier.fillMaxWidth(),
-                    color = WhiteColor.copy(alpha = 0.48f),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.8.sp,
-                    textAlign = TextAlign.Center
-                )
+                    Text(
+                        text = "MULTIVERSE SCAN COMPLETE • WUBBA LUBBA DUB DUB!",
+                        modifier = Modifier.fillMaxWidth(),
+                        color = WhiteColor.copy(alpha = 0.48f),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.8.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
 
@@ -542,9 +581,9 @@ fun CategoriesScreen(
     }
 }
 
-// =====================================================================
+
 // LOAD MORE BUTTON
-// =====================================================================
+
 
 @Composable
 private fun LoadMoreButton(
@@ -595,9 +634,9 @@ private fun LoadMoreButton(
     }
 }
 
-// =====================================================================
+
 // SECTION BUTTON
-// =====================================================================
+
 
 @Composable
 private fun SectionButton(
@@ -634,9 +673,8 @@ private fun SectionButton(
     }
 }
 
-// =====================================================================
 // STATUS FILTER BUTTON
-// =====================================================================
+
 
 @Composable
 private fun StatusFilterButton(
@@ -673,9 +711,8 @@ private fun StatusFilterButton(
     }
 }
 
-// =====================================================================
 // CHARACTER CARD
-// =====================================================================
+
 
 @Composable
 private fun CharacterListCard(
@@ -761,9 +798,8 @@ private fun CharacterListCard(
     }
 }
 
-// =====================================================================
 // EPISODE CARD
-// =====================================================================
+
 
 @Composable
 private fun EpisodeListCard(
@@ -836,9 +872,8 @@ private fun EpisodeListCard(
     }
 }
 
-// =====================================================================
 // EMPTY RESULTS
-// =====================================================================
+
 
 @Composable
 private fun EmptyResultsPanel(
@@ -880,9 +915,9 @@ private fun EmptyResultsPanel(
     }
 }
 
-// =====================================================================
+
 // ERROR PANEL
-// =====================================================================
+
 
 @Composable
 private fun ErrorPanel(message: String) {
@@ -916,9 +951,9 @@ private fun ErrorPanel(message: String) {
     }
 }
 
-// =====================================================================
+
 // SCROLL INDICATOR
-// =====================================================================
+
 
 @Composable
 private fun ScrollIndicator(
